@@ -23,6 +23,12 @@ const gondolaSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    sub_category: {
+        type: String,
+        required: true,
+    },
+    
     isDeleted: {
         type: Boolean,
         default: false,

@@ -11,7 +11,8 @@ const {
   getAllSpecificBins,
   updateBin,
   stayAlive,
-  getAllBinsID
+  getAllBinsID,
+  getDataByArticleCode
 } = require("../controllers/binController");
 
 router.get("/", getAllBins);
@@ -25,6 +26,8 @@ router.post("/delete/:id", deleteBin);
 router.get("/:id", getOneBin);
 
 router.get("/alive/now", stayAlive);
+
+router.get("/product/:articleCode", getDataByArticleCode);
 
 router.post("/update/:id", updateBin);
 

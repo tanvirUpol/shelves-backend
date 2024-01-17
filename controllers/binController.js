@@ -251,6 +251,30 @@ const updateBin = async (req, res) => {
   }
 };
 
+//get data based on article code
+const getDataByArticleCode = async (req, res) => {
+  try {
+    const { articleCode } = req.params;
+
+    console.log(articleCode);
+
+    // Find bins with the specified article code
+    const bins = await Bin.find({
+      'products.article_code': articleCode,
+    });
+
+    if (!bins || bins.length === 0) {
+      return res.status(404).json({ message: 'No data found for the given article code' });
+    }
+
+    // If data is found, return it
+    res.status(200).json({ bins });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 module.exports = {
     getAllBins,
@@ -262,5 +286,6 @@ module.exports = {
     getAllSpecificBins,
     updateBin,
     stayAlive,
-    getAllBinsID
+    getAllBinsID,
+    getDataByArticleCode
 };

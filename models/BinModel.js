@@ -23,6 +23,11 @@ const binSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
+  sub_category: {
+    type: String,
+  },
+  
   
   level: {
     type: String,

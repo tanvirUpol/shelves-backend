@@ -5,7 +5,7 @@ const keyArticleModel = require("../models/keyArticleModel");
 // get all
 const getAllKeyArticles = async (req, res) => {
     try {
-      const keyArticles = await keyArticleModel.find();
+      const keyArticles = await keyArticleModel.find().lean();
       res.json(keyArticles);
     } catch (err) {
       res.status(500).json({ message: err.message });
