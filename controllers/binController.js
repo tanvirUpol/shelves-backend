@@ -347,9 +347,22 @@ const getDataByArticleCode = async (req, res) => {
     console.log(articleCode);
 
     // Find bins with the specified article code
+    // const bins = await Bin.find({
+    //   "products.article_code": articleCode,
+    // });
+
+    // const bins = await Bin.find({
+    //   "products.article_code": articleCode,
+    // }).select("bin_ID gondola_ID");
+
     const bins = await Bin.find({
       "products.article_code": articleCode,
+    }).select({
+      "products.$": 1,
+      bin_ID: 1,
+      gondola_ID: 1,
     });
+    
 
     if (!bins || bins.length === 0) {
       return res
@@ -357,8 +370,16 @@ const getDataByArticleCode = async (req, res) => {
         .json({ message: "No data found for the given article code" });
     }
 
+    const result = bins.map(bin => ({
+      _id: bin._id,
+      bin_ID: bin.bin_ID,
+      gondola_ID: bin.gondola_ID,
+      article_code: bin.products[0].article_code,
+      article_name: bin.products[0].article_name,
+    }));
+
     // If data is found, return it
-    res.status(200).json({ bins });
+    res.status(200).json( result );
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
