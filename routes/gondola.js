@@ -12,7 +12,7 @@ const {
 
 router.get("/", getAllGondola);
 
-router.get("/getAll/ID", getAllGondolaForID);
+router.get("/getAll", getAllGondolaForID);
 
 router.get("/:id", getOneGondola);
 

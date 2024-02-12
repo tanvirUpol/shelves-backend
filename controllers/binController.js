@@ -100,7 +100,7 @@ const generateNewAisleWiseBinID = async (newBin) => {
 
   const existingIDs = bins?.map((obj) => obj.bin_ID);
 
-  console.log(existingIDs);
+  // console.log(existingIDs);
 
   // Find the maximum ID using reduce
   const maxID = existingIDs.reduce((max, id) => {
@@ -118,11 +118,11 @@ const generateNewAisleWiseBinID = async (newBin) => {
   console.log("Generated ID:", newNumberString);
 
   // formData.gondola_ID = newID
-  console.log(newNumberString);
+  // console.log(newNumberString);
 
   newBin.bin_ID = newBin.bin_ID + newNumberString;
 
-  console.log(newBin);
+  // console.log(newBin);
 
   await Bin.create(newBin);
 };
