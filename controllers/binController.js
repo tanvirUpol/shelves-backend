@@ -398,11 +398,11 @@ const checkBinExists = async (req, res) => {
     if (!bin) {
       return res
         .status(404)
-        .json({ status: false });
+        .json({ status: false , message: "No Bin Found" });
     }
 
     // If data is found, return it
-    res.status(200).json( { status: true } );
+    res.status(200).json( { status: true, message: "Bin Found" } );
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
