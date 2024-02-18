@@ -211,7 +211,7 @@ const appendProducts = async (req, res) => {
   try {
     const { binID, newProducts } = req.body;
 
-    // console.log({ binID, newProducts });
+    console.log({ binID, newProducts });
 
     // Validate if binId and newProducts are provided
     if (!binID || !newProducts) {
@@ -232,6 +232,8 @@ const appendProducts = async (req, res) => {
 
     // Append new products to the existing products array
     bin.products = [...bin.products, ...newProducts];
+
+    console.log(bin);
 
     // Save the updated bin
     await bin.save();
@@ -386,6 +388,27 @@ const getDataByArticleCode = async (req, res) => {
   }
 };
 
+
+
+const checkBinExists = async (req, res) => {
+  try {
+    const { binID } = req.params;
+
+    const bin = await Bin.findOne({bin_ID: binID})
+    if (!bin) {
+      return res
+        .status(404)
+        .json({ status: false });
+    }
+
+    // If data is found, return it
+    res.status(200).json( { status: true } );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getAllBins,
   getOneBin,
@@ -398,4 +421,5 @@ module.exports = {
   stayAlive,
   getAllBinsID,
   getDataByArticleCode,
+  checkBinExists
 };
