@@ -17,6 +17,24 @@ const userSchema = new mongoose.Schema({
             min: 8,
             required: true
       },
+      // dcSite: {
+      //       type: Array,
+      //       of: String,
+      //       default: [],
+      //       required: true
+      // },
+      // outletSite: {
+      //       type: Array,
+      //       of: String,
+      //       default: [],
+      //       required: true
+      // },
+      site: {
+            type: Array,
+            of: String,
+            default: [],
+            required: true
+      },
       role: {
             type: String,  // admin or user
             default: "user",

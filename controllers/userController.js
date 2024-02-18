@@ -58,9 +58,10 @@ const login = async (req, res) => {
       });
     }
 
-    console.log(user);
+    // console.log(user);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log(isPasswordValid);
 
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -68,6 +69,7 @@ const login = async (req, res) => {
         message: "Invalid email or password",
       });
     }
+
 
     
 
@@ -219,6 +221,42 @@ const users = async (req, res) => {
   }
 };
 
+
+
+// get all picker packer
+const getAllPickerPacker = async (req, res) => {
+  try {
+    const allUsers = await UserModel.find({ isDeleted: false, role: { $in: ["picker", "packer"]} })
+      .select("-password")
+      .lean();
+
+    // Fetching role for each user and attaching role permissions concurrently
+    for (let i = 0; i < allUsers.length; i++) {
+      const user = allUsers[i];
+      const role = await Role.findOne({
+        role: { $regex: new RegExp(user.role, "i") },
+      }).lean();
+      if (role) {
+        allUsers[i] = {
+          ...user,
+          hasPermission: role.hasPermission,
+        };
+      }
+    }
+
+    res.status(200).json({
+      status: true,
+      users: allUsers,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      message: `${err}`,
+    });
+  }
+};
+
+
 // GET all deleted users
 const deletedUsers = async (req, res) => {
   try {
@@ -358,21 +396,12 @@ const update = async (req, res) => {
     });
   }
 
-  if (req.body.password) {
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(req.body.password, salt);
 
     userDetails = {
       ...req.body,
-      password: passwordHash,
       updatedAt: new Date(),
     };
-  } else {
-    userDetails = {
-      ...req.body,
-      updatedAt: new Date(),
-    };
-  }
+  
 
   try {
     let updatedUser = await UserModel.findByIdAndUpdate(id, userDetails, {
@@ -400,5 +429,6 @@ module.exports = {
   userPreferences,
   user,
   update,
-  changePass
+  changePass,
+  getAllPickerPacker
 };
