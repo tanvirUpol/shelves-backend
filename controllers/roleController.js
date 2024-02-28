@@ -28,6 +28,8 @@ const addPermission = async (req, res) => {
   const { roleId } = req.params;
   const { permission } = req.body;
 
+  console.log(permission);
+
   try {
     const role = await Role.findById(roleId);
     if (!role) {

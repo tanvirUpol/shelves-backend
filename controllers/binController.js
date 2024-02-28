@@ -74,12 +74,13 @@ const getAllSpecificBins = async (req, res) => {
 const getOneBin = async (req, res) => {
   const { id } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "No Such product" });
-  }
+  // if (!mongoose.Types.ObjectId.isValid(id)) {
+  //   return res.status(404).json({ error: "No Such product" });
+  // }
 
   try {
-    const bin = await Bin.findById(id);
+    // const bin = await Bin.findById(id);
+    const bin = await Bin.findOne({bin_ID: id});
     const gondola = await Gondola.findOne({ gondola_ID: bin.gondola_ID });
 
     if (bin == null) {
