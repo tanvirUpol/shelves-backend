@@ -45,7 +45,6 @@ const createKeyArticles = async (req, res) => {
           await keyArticleModel.insertMany(chunk);
           console.log("uploaded", i)
       }
-
       res.status(201).json("success");
   } catch (error) {
       console.log(error);

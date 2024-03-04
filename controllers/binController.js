@@ -364,7 +364,12 @@ const getDataByArticleCode = async (req, res) => {
       "products.$": 1,
       bin_ID: 1,
       gondola_ID: 1,
+      dc: 1
     });
+
+    // const bins2 = await Bin.find({
+    //   "products.article_code": articleCode,
+    // })
     
 
     if (!bins || bins.length === 0) {
@@ -373,12 +378,15 @@ const getDataByArticleCode = async (req, res) => {
         .json({ message: "No data found for the given article code" });
     }
 
+    // console.log(bins)
+
     const result = bins.map(bin => ({
       _id: bin._id,
       bin_ID: bin.bin_ID,
       gondola_ID: bin.gondola_ID,
       article_code: bin.products[0].article_code,
       article_name: bin.products[0].article_name,
+      site: bin.dc
     }));
 
     // If data is found, return it
