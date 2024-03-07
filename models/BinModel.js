@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
+const { shelves_db } = require("../mongConnection");
 
+// console.log(shelves_db);
 const binSchema = new mongoose.Schema({
   // gondola: {
   //   type: mongoose.Schema.Types.ObjectId,
@@ -59,9 +61,9 @@ const binSchema = new mongoose.Schema({
     type: Array,
     default: [],
     required: true,
-  },
-});
+  }
+},{timestamps:true});
 
-const Bin = mongoose.model("Bin", binSchema);
+const Bin = shelves_db.model("Bin", binSchema);
 
 module.exports = Bin;

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const { shelves_db } = require("../mongConnection");
 const gondolaSchema = new mongoose.Schema({
     // bins:[
     //     {
@@ -50,8 +50,8 @@ const gondolaSchema = new mongoose.Schema({
         type: Number,
         // required: true,
     }
-});
+},{timestamps:true});
 
-const Gondola = mongoose.model('Gondola', gondolaSchema);
+const Gondola = shelves_db.model('Gondola', gondolaSchema);
 
 module.exports = Gondola;

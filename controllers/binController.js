@@ -10,6 +10,7 @@ const getAllBins = async (req, res) => {
     const gondola = await Gondola.find({ isDeleted: false });
     res.json({ bins, gondola });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -88,6 +89,7 @@ const getOneBin = async (req, res) => {
     }
     res.json({ bin, gondola });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: err.message });
   }
 };

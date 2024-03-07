@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { shelves_db } = require("../mongConnection");
 
 const keyArticleSchema = new mongoose.Schema({
   article_code: {
@@ -11,7 +12,7 @@ const keyArticleSchema = new mongoose.Schema({
   }
 });
 
-const keyArticleModel =  mongoose.model('keyArticle', keyArticleSchema);
+const keyArticleModel =  shelves_db.model('keyArticle', keyArticleSchema);
 
 
 module.exports = keyArticleModel;
