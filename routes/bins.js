@@ -13,7 +13,8 @@ const {
   stayAlive,
   getAllBinsID,
   getDataByArticleCode,
-  checkBinExists
+  checkBinExists,
+  getDataByArticleCodeAndSite
 } = require("../controllers/binController");
 
 router.get("/", getAllBins);
@@ -30,7 +31,10 @@ router.get("/:id", getOneBin);
 
 router.get("/alive/now", stayAlive);
 
+
 router.get("/product/:articleCode", getDataByArticleCode);
+// new
+router.get("/product/:articleCode/:dc", getDataByArticleCodeAndSite);
 
 router.post("/update/:id", updateBin);
 
