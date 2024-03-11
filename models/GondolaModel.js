@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
 const { shelves_db } = require("../mongConnection");
 const gondolaSchema = new mongoose.Schema({
-    // bins:[
-    //     {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Bin',
-    //     }
-    // ],
+    type: {
+        type: String,
+        default: "Regular",
+        required: true
+    },
     gondola_ID: {
         type: String,
         required: true
