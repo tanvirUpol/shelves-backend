@@ -82,6 +82,7 @@ const getOneBin = async (req, res) => {
   try {
     // const bin = await Bin.findById(id);
     const bin = await Bin.findOne({bin_ID: id});
+    console.log(bin);
     const gondola = await Gondola.findOne({ gondola_ID: bin.gondola_ID });
 
     if (bin == null) {

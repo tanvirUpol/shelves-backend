@@ -1,4 +1,6 @@
 const mongoose = require("mongoose")
+const { ift_db } = require("../mongConnection");
+
 
 const userSchema = new mongoose.Schema({
       name: {
@@ -14,21 +16,8 @@ const userSchema = new mongoose.Schema({
       },
       password: {
             type: String,
-            min: 8,
             required: true
       },
-      // dcSite: {
-      //       type: Array,
-      //       of: String,
-      //       default: [],
-      //       required: true
-      // },
-      // outletSite: {
-      //       type: Array,
-      //       of: String,
-      //       default: [],
-      //       required: true
-      // },
       site: {
             type: Array,
             of: String,
@@ -36,15 +25,15 @@ const userSchema = new mongoose.Schema({
             required: true
       },
       role: {
-            type: String,  // admin or user
+            type: String,  // admin or user etc.
             default: "user",
       },
-    //   hasPermission: {
-    //         type: Array,
-    //         of: String,   // array of strings that represent the permissions a user has
-    //         default: [],
-    //         required: true
-    //   },
+      hasPermission: {
+            type: Array,
+            of: String,   // array of strings that represent the permissions a user has
+            default: [],
+            required: true
+      },
       isDeleted: {
             type: Boolean,
             default: false,
@@ -60,4 +49,4 @@ const userSchema = new mongoose.Schema({
       }
 })
 
-module.exports = mongoose.model("User", userSchema)
+module.exports = ift_db.model("User", userSchema)

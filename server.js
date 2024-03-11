@@ -10,6 +10,7 @@ const keyArticleRoutes = require("./routes/keyArticle");
 const productHistoryRoutes = require("./routes/productHistory");
 const roleRoutes = require("./routes/role");
 const userRoutes = require("./routes/UserRoutes");
+const acitivityRoutes = require("./routes/activityLog");
 
 //express app
 const app = express();
@@ -36,6 +37,8 @@ app.use("/api/keyArticle", keyArticleRoutes);
 app.use("/api/history", productHistoryRoutes);
 
 app.use("/api/roles", roleRoutes);
+
+app.use("/api/activity", acitivityRoutes )
 
 // connect to db
 // mongoose

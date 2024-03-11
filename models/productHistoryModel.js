@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { shelves_db } = require("../mongConnection");
 
 const productHistorySchema = new mongoose.Schema(
   {
@@ -23,6 +24,6 @@ const productHistorySchema = new mongoose.Schema(
   }
 );
 
-const productHistoryModel = mongoose.model("ProductHistory", productHistorySchema);
+const productHistoryModel = shelves_db.model("ProductHistory", productHistorySchema);
 
 module.exports = productHistoryModel;

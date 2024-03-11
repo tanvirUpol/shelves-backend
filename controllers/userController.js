@@ -1,434 +1,406 @@
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const UserModel = require("../models/UserModel");
+const bcrypt = require('bcrypt');
+const UserModel = require('../models/UserModel');
+const RoleModel = require('../models/RolesModel');
 const mongoose = require("mongoose");
-const Role = require("../models/RolesModel");
+
 // Register a new user
 const register = async (req, res) => {
-  try {
-    const { email } = req.body;
-    let userExist = Boolean(await UserModel.findOne({ email }));
+      try {
+            const { email } = req.body
+            const userExist = Boolean(await UserModel.findOne({ email }))
 
-    if (!userExist) {
-      const salt = await bcrypt.genSalt(10);
-      const passwordHash = await bcrypt.hash(req.body.password, salt);
+            if (!userExist) {
+                  const salt = await bcrypt.genSalt(10);
+                  const passwordHash = await bcrypt.hash(req.body.password, salt);
 
-      let user = await UserModel.create({
-        ...req.body,
-        password: passwordHash,
-      });
+                  let user = await UserModel.create(
+                        {
+                              ...req.body,
+                              password: passwordHash
+                        }
+                  );
 
-      return res.status(201).send({
-        status: true,
-        message: "User created successfully!",
-        token: jwt.sign(
-          {
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          },
-          process.env.JWT
-        ),
-      });
-    } else {
-      return res.status(409).send({
-        status: false,
-        message: `User exist with ${email}`,
-      });
-    }
-  } catch (err) {
-    res.send({
-      status: false,
-      message: `Error in registration : ${err}`,
-    });
-  }
-};
+                  return res.status(201).send(
+                        {
+                              status: true,
+                              message: "User created successfully!",
+                              token: jwt.sign({
+                                    name: user.name,
+                                    email: user.email,
+                                    role: user.role,
+                              }, process.env.JWT)
+                        })
+            }
+            else {
+                  return res.status(409).send({
+                        status: false,
+                        message: `User exist with ${email}`
+                  })
+            }
+      }
+      catch (err) {
+            res.send({
+                  status: false,
+                  message: `Error in registration : ${err}`
+            })
+      }
+}
 
+// User Login
 const login = async (req, res) => {
-  const { email, password } = req.body;
+      try {
+            const { email, password } = req.body
+            const user = await UserModel.findOne({ email })
+            const userWithoutPassword = await UserModel.findOne({ email }).select(" -password")
+            const userExist = Boolean(user)
 
-  try {
-    let user = await UserModel.findOne({ email }).lean();
-    const userExist = Boolean(user);
+            if (!userExist) {
+                  return res.status(401).json({
+                        status: false,
+                        message: `User doesn't exist`
+                  })
+            }
 
-    if (!userExist) {
-      return res.status(401).json({
-        status: false,
-        message: `User doesn't exist`,
-      });
-    }
+            const isPasswordValid = await bcrypt.compare(password, user.password)
 
-    // console.log(user);
+            if (!user || !isPasswordValid) {
+                  return res.status(401).json({
+                        status: false,
+                        message: "Invalid email or password"
+                  })
+            }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log(isPasswordValid);
+            const role = await RoleModel.findOne({ role: user.role })
 
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        status: false,
-        message: "Invalid email or password",
-      });
-    }
+            if (!role && user.role !== 'user') {
+                  return res.status(500).send({
+                        status: false,
+                        message: "User role not found",
+                  });
+            }
 
+            if (role || user.role === 'user') {
 
-    
+                  user.hasPermission = role?.hasPermission ? role?.hasPermission : []
 
-    // Fetching role from Role model
-    const role = await Role.findOne({ role: user.role });
-    if (!role) {
-      return res.status(500).json({
-        status: false,
-        message: "User role not found",
-      });
-    }
+                  const token = jwt.sign(
+                        {
+                              email: user.email,
+                              name: user.name,
+                              role: user.role
+                        },
+                        process.env.JWT,
+                        {
+                              expiresIn: '365d'
+                        });
 
-    //     console.log(role.hasPermission);
-
-    // Attaching role permissions to user
-    user = {
-      ...user,
-      hasPermission: role?.hasPermission? role.hasPermission : [],
-    };
-
-    console.log("User object with role permissions:", user);
-
-    // Generating JWT token
-    let token = jwt.sign(
-      {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
-      process.env.JWT,
-      {
-        expiresIn: "7d",
+                  res.status(200).json({
+                        status: true,
+                        message: "User logged in successfully!",
+                        token: `Bearer ${token}`,
+                        user: userWithoutPassword
+                  });
+            }
       }
-    );
-    // Remove the password field from the user object
-    const { password: pass, ...userWithoutPassword } = user;
-
-    res.send({
-      status: true,
-      message: "User logged in successfully!",
-      token: `Bearer ${token}`,
-      user: userWithoutPassword,
-    });
-  } catch (error) {
-    console.error("Error during login:", error);
-    res.status(500).json({
-      status: false,
-      message: "Internal server error",
-    });
-  }
-};
-
-const changePass = async (req, res) => {
-  const { id } = req.params;
-  const { password, newPassword } = req.body;
-
-  try {
-    const user = await UserModel.findOne({ _id: id }).select(
-      "_id email password"
-    );
-    const userExist = Boolean(user);
-
-    if (!userExist) {
-      return res.status(401).json({
-        status: false,
-        message: `User doesn't exist`,
-      });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        status: false,
-        message: "Invalid email or password",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    await UserModel.findOneAndUpdate(
-      { _id: id },
-      { password: hashedPassword },
-      {
-        new: true, // Return the modified document rather than the original
-        projection: "_id email", // Specify the fields to return in the result
+      catch (err) {
+            res.status(500).json({
+                  status: false,
+                  message: `${err}`
+            })
       }
-    );
-
-    res.send({
-      status: true,
-      message: "User logged in successfully!",
-    });
-  } catch (error) {
-    console.error("Error during login:", error);
-    res.status(500).json({
-      status: false,
-      message: "Internal server error",
-    });
-  }
-};
+}
 
 // GET all users
-// const users = async (req, res) => {
-//   try {
-//     const allUsers = await UserModel.find({ isDeleted: false });
-
-//     res.status(200).json({
-//       status: true,
-//       users: allUsers,
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       status: false,
-//       message: `${err}`,
-//     });
-//   }
-// };
-
 const users = async (req, res) => {
-  try {
-    const allUsers = await UserModel.find({ isDeleted: false })
-      .select("-password")
-      .lean();
-
-    // Fetching role for each user and attaching role permissions concurrently
-    for (let i = 0; i < allUsers.length; i++) {
-      const user = allUsers[i];
-      const role = await Role.findOne({
-        role: { $regex: new RegExp(user.role, "i") },
-      }).lean();
-      if (role) {
-        allUsers[i] = {
-          ...user,
-          hasPermission: role.hasPermission,
-        };
+      try {
+            await search(req, res, '')
       }
-    }
-
-    res.status(200).json({
-      status: true,
-      users: allUsers,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: false,
-      message: `${err}`,
-    });
-  }
-};
-
-
-
-// get all picker packer
-const getAllPickerPacker = async (req, res) => {
-  try {
-    const allUsers = await UserModel.find({ isDeleted: false, role: { $in: ["picker", "packer"]} })
-      .select("-password")
-      .lean();
-
-    // Fetching role for each user and attaching role permissions concurrently
-    for (let i = 0; i < allUsers.length; i++) {
-      const user = allUsers[i];
-      const role = await Role.findOne({
-        role: { $regex: new RegExp(user.role, "i") },
-      }).lean();
-      if (role) {
-        allUsers[i] = {
-          ...user,
-          hasPermission: role.hasPermission,
-        };
+      catch (err) {
+            res.status(500).json({
+                  status: false,
+                  message: `${err}`
+            })
       }
-    }
-
-    res.status(200).json({
-      status: true,
-      users: allUsers,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: false,
-      message: `${err}`,
-    });
-  }
-};
-
-
-// GET all deleted users
-const deletedUsers = async (req, res) => {
-  try {
-    const allUsers = await UserModel.find({ isDeleted: true });
-
-    res.status(200).json({
-      status: true,
-      users: allUsers,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: false,
-      message: `${err}`,
-    });
-  }
-};
+}
 
 // GET all user preferences
-const userPreferences = async (req, res) => {
-  try {
-    await UserModel.find({}, "role hasPermission")
-      .exec()
-      .then((users) => {
-        const userRolesAndPermissions = {
-          roles: [...new Set(users.map((user) => user.role))],
-          permissions: [
-            ...new Set(
-              users.reduce((acc, user) => acc.concat(user.hasPermission), [])
-            ),
-          ],
-        };
+// const userPreferences = async (req, res) => {
 
-        res.status(200).json({
-          status: true,
-          preferences: userRolesAndPermissions,
-        });
-      })
-      .catch((err) => {
-        res.status(500).json({
-          status: false,
-          message: `${err}`,
-        });
-      });
-  } catch (err) {
-    res.status(500).json({
-      status: false,
-      message: `${err}`,
-    });
-  }
-};
+//       try {
+//             await UserModel.find({}, 'role hasPermission').exec()
+//                   .then(users => {
+//                         const userRolesAndPermissions = {
+//                               roles: [...new Set(users.map(user => user.role))],
+//                               permissions: [...new Set(users.reduce((acc, user) => acc.concat(user.hasPermission), []))]
+//                         };
 
-// GET user by Id
-// const user = async (req, res) => {
-//   const { id } = req.params;
+//                         res.status(200).json({
+//                               status: true,
+//                               preferences: userRolesAndPermissions
+//                         });
+//                   })
+//                   .catch(err => {
+//                         res.status(500).json({
+//                               status: false,
+//                               message: `${err}`
+//                         });
+//                   });
 
-//   if (!mongoose.Types.ObjectId.isValid(id)) {
-//     return res.status(404).json({
-//       status: false,
-//       message: `User Id Incorrect`,
-//     });
-//   }
+//       } catch (err) {
+//             res.status(500).json({
+//                   status: false,
+//                   message: `${err}`
+//             });
+//       }
 
-//   try {
-//     const singleUser = await UserModel.findById(id);
-
-//     res.status(200).json({
-//       status: true,
-//       user: singleUser,
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       status: false,
-//       message: `${err}`,
-//     });
-//   }
-// };
+// }
 
 // GET user by Id
 const user = async (req, res) => {
-  const { id } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({
-      status: false,
-      message: `User Id Incorrect`,
-    });
-  }
+      const { id } = req.params
 
-  try {
-    let singleUser = await UserModel.findById(id).select("-password").lean();
+      try {
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                  return res.status(404).json({
+                        status: false,
+                        message: `User Id Incorrect`
+                  })
+            }
 
-    if (!singleUser) {
-      return res.status(404).json({
-        status: false,
-        message: `User not found`,
-      });
-    }
+            const foundUser = await UserModel.findById(id).select(" -password").lean()
 
-    // Fetching role from Role model
-    const role = await Role.findOne({ role: singleUser.role });
+            if (!foundUser) {
+                  return res.status(404).json({
+                        status: false,
+                        message: `User not found`,
+                  });
+            }
 
-    if (!role) {
-      return res.status(500).json({
-        status: false,
-        message: "User role not found",
-      });
-    }
+            const role = await RoleModel.findOne({ role: foundUser.role });
 
-    // Attaching role permissions to user using spread operator
-    singleUser = {
-      ...singleUser,
-      hasPermission: role.hasPermission,
-    };
+            if (!role && foundUser.role !== 'user') {
+                  return res.status(500).json({
+                        status: false,
+                        message: "User role not found",
+                  });
+            }
 
-    res.status(200).json({
-      status: true,
-      user: singleUser,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      status: false,
-      message: `${err}`,
-    });
-  }
+            if (role || foundUser.role === 'user') {
+                  foundUser.hasPermission = role?.hasPermission ? role?.hasPermission : []
+
+                  res.status(200).json({
+                        status: true,
+                        user: foundUser
+                  })
+            }
+      }
+      catch (err) {
+            res.status(500).json({
+                  status: false,
+                  message: `${err}`
+            })
+      }
+}
+
+// get all picker packer
+const getAllPickerPacker = async (req, res) => {
+      try {
+            const allUsers = await UserModel.find(
+                  {
+                        isDeleted: false,
+                        site: req.params.site,
+                        role: { $in: ["picker", "packer"] }
+                  })
+                  .select(" -password")
+                  .lean();
+
+            for (let i = 0; i < allUsers.length; i++) {
+                  const user = allUsers[i];
+                  const role = await RoleModel.findOne({
+                        role: { $regex: new RegExp(user.role, "i") },
+                  }).lean()
+
+                  if (role) {
+                        allUsers[i] = {
+                              ...user,
+                              hasPermission: role.hasPermission,
+                        };
+                  }
+            }
+
+            res.status(200).json({
+                  status: true,
+                  users: allUsers
+            });
+      }
+      catch (err) {
+            res.status(500).json({
+                  status: false,
+                  message: `${err}`,
+            });
+      }
 };
 
 // Update user by Id
 const update = async (req, res) => {
-  const { id } = req.params;
-  let userDetails = {};
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({
-      status: false,
-      message: `User Id incorrect`,
-    });
-  }
+      const { id } = req.params
+      const { password, newPassword } = req.body
+      let userDetails = {}
 
+      try {
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                  return res.status(404).json({
+                        status: false,
+                        message: `User Id incorrect`
+                  })
+            }
 
-    userDetails = {
-      ...req.body,
-      updatedAt: new Date(),
-    };
-  
+            const user = await UserModel.findById(id)
+            const userExist = Boolean(user)
 
-  try {
-    let updatedUser = await UserModel.findByIdAndUpdate(id, userDetails, {
-      new: true,
-      runValidators: true,
-    });
+            if (!userExist) {
+                  return res.status(401).json({
+                        status: false,
+                        message: `User doesn't exist`,
+                  });
+            }
 
-    res.status(201).json({
-      status: true,
-      user: updatedUser,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: false,
-      message: `${err}`,
-    });
-  }
-};
+            if(!password && newPassword){
+                  return res.status(401).json({
+                        status: false,
+                        message: "Please enter old password"
+                  });
+            }
+
+            if (password && !newPassword) {
+                  return res.status(401).json({
+                        status: false,
+                        message: `Please enter new password`
+                  });
+
+            }
+
+            if (password && newPassword) {
+                  const isPasswordValid = await bcrypt.compare(password, user.password)
+
+                  if (!isPasswordValid) {
+                        return res.status(401).json({
+                              status: false,
+                              message: "Incorrect old password"
+                        });
+                  }
+
+                  const salt = await bcrypt.genSalt(10);
+                  const passwordHash = await bcrypt.hash(newPassword, salt);
+
+                  userDetails = {
+                        ...req.body,
+                        password: passwordHash,
+                        updatedAt: new Date()
+                  }
+            }
+
+            else {
+                  userDetails = {
+                        ...req.body,
+                        updatedAt: new Date()
+                  }
+            }
+
+            let updatedUser = await UserModel.findByIdAndUpdate
+                  (
+                        id, userDetails,
+                        {
+                              new: true,
+                              runValidators: true
+                        }
+                  ).select(" -password")
+
+            res.status(201).json({
+                  status: true,
+                  message: "User updated successfully",
+                  user: updatedUser
+            })
+      }
+      catch (err) {
+            res.status(500).json({
+                  status: false,
+                  message: `${err}`
+            })
+      }
+}
+
+const search = async (req, res, status) => {
+
+      let filter = {
+            isDeleted: false,
+            status
+      };
+
+      if (status === '') {
+            filter = {
+                  isDeleted: false
+            };
+      }
+      if (req.query.filterBy && req.query.value) {
+            filter[req.query.filterBy] = req.query.value;
+      }
+
+      const pageSize = +req.query.pageSize || 10;
+      const currentPage = +req.query.currentPage || 1;
+      const sortBy = req.query.sortBy || '_id'; // _id or description or code or po or etc.
+      const sortOrder = req.query.sortOrder || 'desc'; // asc or desc
+
+      const totalItems = await UserModel.find(filter).countDocuments();
+      const items = await UserModel.find(filter)
+            .skip((pageSize * (currentPage - 1)))
+            .limit(pageSize)
+            .sort({ [sortBy]: sortOrder })
+            .select(" -password")
+            .lean()
+
+      for (let i = 0; i < items.length; i++) {
+            const user = items[i];
+            const role = await RoleModel.findOne({
+                  role: { $regex: new RegExp(user.role, "i") },
+            }).lean();
+            if (role) {
+                  items[i] = {
+                        ...user,
+                        hasPermission: role.hasPermission,
+                  };
+            }
+      }
+
+      const responseObject = {
+            status: true,
+            totalPages: Math.ceil(totalItems / pageSize),
+            totalItems,
+            items
+      };
+
+      if (items.length) {
+            return res.status(200).json(responseObject);
+      }
+
+      else {
+            return res.status(401).json({
+                  status: false,
+                  message: "Nothing found",
+                  items
+            });
+      }
+}
 
 module.exports = {
-  register,
-  login,
-  users,
-  deletedUsers,
-  userPreferences,
-  user,
-  update,
-  changePass,
-  getAllPickerPacker
-};
+      register,
+      login,
+      users,
+      // userPreferences,
+      user,
+      getAllPickerPacker,
+      update
+}
