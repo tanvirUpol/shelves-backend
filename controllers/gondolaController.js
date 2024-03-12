@@ -49,8 +49,9 @@ const getOneGondola = async (req, res) => {
 const createGondola = async (req, res) => {
   // console.log(req.body);
   try {
-    const newGondola = await Gondola.create(req.body);
-    res.status(201).json(newGondola);
+    const item = await Gondola.create(req.body);
+    console.log(item);
+    res.status(201).json({item});
   } catch (err) {
     console.log(err.message);
     res.status(400).json({ message: err.message });

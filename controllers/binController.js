@@ -179,7 +179,7 @@ const createBin = async (req, res) => {
     }
 
     // console.log(req.body);
-    res.status(201).json("ok");
+    res.status(201).json({item:newBin});
   } catch (err) {
     console.log(err.message);
     res.status(400).json({ message: err.message });

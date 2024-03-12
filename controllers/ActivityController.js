@@ -6,6 +6,7 @@ const Activity = require("../models/ActivityModel");
 const createActivityLog = async (req, res) => {
   const data = req.body;
 
+  console.log(data);
   try {
     const NewActivity = await Activity.create(data);
     res.status(201).json({ message: "User activity recorded" });
