@@ -378,7 +378,7 @@ const getDataByArticleCode = async (req, res) => {
     }));
 
     // If data is found, return it
-    res.status(200).json( result );
+    res.status(200).json( {status: true, bins: result} );
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -416,7 +416,7 @@ const getDataByArticleCodeAndSite = async (req, res) => {
     }));
 
     // If data is found, return it
-    res.status(200).json(result);
+    res.status(200).json({status: true, bins: result});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
