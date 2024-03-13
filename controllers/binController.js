@@ -364,7 +364,10 @@ const getDataByArticleCode = async (req, res) => {
     if (!bins || bins.length === 0) {
       return res
         .status(404)
-        .json({ message: "No data found for the given article code" });
+        .json({
+          status: false, 
+          message: "No data found for the given article code" 
+        });
     }
 
 
@@ -378,10 +381,13 @@ const getDataByArticleCode = async (req, res) => {
     }));
 
     // If data is found, return it
-    res.status(200).json( {status: true, bins: result} );
+    res.status(200).json( { 
+      status: true, 
+      bins: result
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({status: false, message: "Internal server error" });
   }
 };
 
