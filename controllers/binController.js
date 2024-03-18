@@ -222,6 +222,7 @@ const appendProducts = async (req, res) => {
       return res
         .status(400)
         .json({
+          status: false,
           error: "binId and newProducts are required in the request body",
         });
     }
@@ -231,7 +232,7 @@ const appendProducts = async (req, res) => {
 
     // Check if the bin exists
     if (!bin) {
-      return res.status(404).json({ error: "Bin not found" });
+      return res.status(404).json({status: false, error: "Bin not found" });
     }
 
     // Append new products to the existing products array
@@ -244,10 +245,10 @@ const appendProducts = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "Products appended successfully", bin });
+      .json({status: true, message: "Products assigned successfully", bin });
   } catch (error) {
     console.error("Error appending products:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({status: false, error: "Internal server error" });
   }
 };
 
