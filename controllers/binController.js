@@ -86,12 +86,12 @@ const getOneBin = async (req, res) => {
     const gondola = await Gondola.findOne({ gondola_ID: bin.gondola_ID });
 
     if (bin == null) {
-      return res.status(404).json({ message: "Cannot find bin" });
+      return res.status(404).json({status:false, message: "Cannot find bin" });
     }
-    res.json({ bin, gondola });
+    res.json({ status:true, bin, gondola });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({status:false, message: err.message });
   }
 };
 
