@@ -410,7 +410,7 @@ const getDataByArticleCodeAndSite = async (req, res) => {
     if (!bins || bins.length === 0) {
       return res
         .status(404)
-        .json({ message: "No data found for the given article code and dc" });
+        .json({status: false,   message: "No data found for the given article code or dc" , bins: []});
     }
 
     const result = bins.map(bin => ({
