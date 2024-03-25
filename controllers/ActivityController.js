@@ -11,6 +11,7 @@ const createActivityLog = async (req, res) => {
     const NewActivity = await Activity.create(data);
     res.status(201).json({ message: "User activity recorded" });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ status:false, message: err.message });
   }
 };

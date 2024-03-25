@@ -11,6 +11,7 @@ const productHistoryRoutes = require("./routes/productHistory");
 const roleRoutes = require("./routes/role");
 const userRoutes = require("./routes/UserRoutes");
 const acitivityRoutes = require("./routes/activityLog");
+const barcodesRoutes = require("./routes/barcodes");
 
 //express app
 const app = express();
@@ -27,6 +28,8 @@ app.use((req, res, next) => {
 // ROUTES
 
 app.use("/api/user", userRoutes); // User API
+
+app.use("/api/barcodes", barcodesRoutes); // User API
 
 app.use("/api/bins", binRoutes);
 
