@@ -1,12 +1,28 @@
 const Barcode = require('../models/BarcodesModel');
 
+function transformData(inputData) {
+  const outputData = {};
+  inputData.forEach(item => {
+      if (!outputData.material) {
+          outputData.material = item.material;
+          outputData.description = item.description;
+          outputData.barcodes = [];
+      }
+      outputData.barcodes.push(item.barcode);
+  });
+  
+  return outputData;
+}
+
+
 // Controller function to fetch all documents by material
 const getAllByMaterial = async (req, res) => {
   const { material } = req.params;
   
   try {
     const barcodes = await Barcode.find({ material });
-    res.json(barcodes);
+    
+    res.json({status: true, data:transformData(barcodes)});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
