@@ -21,6 +21,10 @@ const getAllByMaterial = async (req, res) => {
   
   try {
     const barcodes = await Barcode.find({ material });
+
+    if(!barcodes) {
+      return res.status(404).json({ message: 'Barcodes not found', status: false });
+    }
     
     res.json({status: true, data:transformData(barcodes)});
   } catch (error) {
