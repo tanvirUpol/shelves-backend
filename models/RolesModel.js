@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { shelves_db } = require("../mongConnection");
 
 const RolesSchema = new mongoose.Schema({
     role: {
@@ -18,6 +19,6 @@ const RolesSchema = new mongoose.Schema({
 
 });
 
-const Role = mongoose.model('Role', RolesSchema);
+const Role = shelves_db.model('Role', RolesSchema);
 
 module.exports = Role;

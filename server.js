@@ -12,6 +12,7 @@ const roleRoutes = require("./routes/role");
 const userRoutes = require("./routes/UserRoutes");
 const acitivityRoutes = require("./routes/activityLog");
 const barcodesRoutes = require("./routes/barcodes");
+const sitesRoutes = require("./routes/sites");
 
 //express app
 const app = express();
@@ -29,7 +30,9 @@ app.use((req, res, next) => {
 
 app.use("/api/user", userRoutes); // User API
 
-app.use("/api/barcodes", barcodesRoutes); // User API
+app.use("/api/barcodes", barcodesRoutes); // barcodes API
+
+app.use("/api/sites", sitesRoutes)
 
 app.use("/api/bins", binRoutes);
 
