@@ -22,7 +22,9 @@ const getAllByMaterial = async (req, res) => {
   try {
     const barcodes = await Barcode.find({ material });
 
-    if(!barcodes) {
+
+
+    if(!barcodes || barcodes.length === 0) {
       return res.status(404).json({ message: 'Barcodes not found', status: false });
     }
     
