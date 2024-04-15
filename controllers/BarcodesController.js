@@ -43,9 +43,9 @@ const getAllByBarcode = async (req, res) => {
   try {
     const barcodeDoc = await Barcode.find({ barcode });
     if (!barcodeDoc || barcodeDoc.length === 0) {
-      return res.status(404).json({ message: 'Barcode not found' });
+      return res.status(404).json({ message: 'Product not found', status: false });
     }
-    res.json(barcodeDoc);
+    res.json({ status:true, data:barcodeDoc[0] });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
