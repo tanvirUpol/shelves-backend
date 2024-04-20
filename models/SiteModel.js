@@ -31,6 +31,19 @@ const SiteModelSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    imgURL: {
+        type: String,
+        // required: true,
+        default: ""
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
     storage_location: [{
         type: storageLocationSchema,
         required: true

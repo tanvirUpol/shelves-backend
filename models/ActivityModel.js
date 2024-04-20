@@ -9,15 +9,16 @@ const ActivitySchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: [
-        "create",
-        "read",
-        "update",
-        "delete",
-        "log_in",
-        "log_out",
-        "fetch",
-      ],
+      // enum: [
+      //   "create",
+      //   "read",
+      //   "update",
+      //   "delete",
+      //   "register",
+      //   "log_in",
+      //   "log_out",
+      //   "fetch",
+      // ],
       required: true,
     },
     activity: {

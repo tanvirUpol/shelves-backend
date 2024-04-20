@@ -13,6 +13,7 @@ const userRoutes = require("./routes/UserRoutes");
 const acitivityRoutes = require("./routes/activityLog");
 const barcodesRoutes = require("./routes/barcodes");
 const sitesRoutes = require("./routes/sites");
+const AppVersionRoute = require("./routes/userAppVersion")
 
 //express app
 const app = express();
@@ -45,6 +46,8 @@ app.use("/api/history", productHistoryRoutes);
 app.use("/api/roles", roleRoutes);
 
 app.use("/api/activity", acitivityRoutes )
+
+app.use("/api/version", AppVersionRoute )
 
 // connect to db
 // mongoose
