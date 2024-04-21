@@ -4,9 +4,9 @@ const Site = require("../models/SiteModel");
 const getSites = async (req, res) => {
   try {
     const sites = await Site.find();
-    res.json(sites);
+    res.json({status: true , sites:sites});
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({status: false , message: err.message });
   }
 };
 
@@ -18,9 +18,9 @@ const getSiteById = async (req, res) => {
     if (!site) {
       return res.status(404).json({ message: "Site not found" });
     }
-    res.json(site);
+    res.json({satus: true, site:site});
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({status:false, message: err.message });
   }
 };
 
