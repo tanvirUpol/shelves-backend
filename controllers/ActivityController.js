@@ -52,7 +52,7 @@ const getAllActivityLog = async (req, res) => {
 
     res.status(200).json({
       status: true,
-      logs: allActivity,
+      logs: allActivity.reverse(),
     });
   } catch (err) {
     res.status(500).json({ status: false, message: err.message });
@@ -62,14 +62,15 @@ const getAllActivityLog = async (req, res) => {
 // get all acitivity by type
 const getAllActivityLogByType = async (req, res) => {
   const data = req.body;
+  console.log(data);
   try {
-    const allActivity = await Activity.find({ type: data.type }).populate({
+    const allActivity = await Activity.find(data).populate({
       path: "user",
       select: "-__v -password -createdAt -updatedAt",
     });
     res.status(201).json({
       status: true,
-      logs: allActivity,
+      logs: allActivity.reverse(),
     });
   } catch (err) {
     res.status(500).json({ status: false, message: err.message });

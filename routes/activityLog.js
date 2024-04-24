@@ -11,7 +11,7 @@ const {
 
 router.post("/", getAllActivityLog);
 
-router.get("/type", getAllActivityLogByType);
+router.post("/type", getAllActivityLogByType);
 
 router.post("/create", createActivityLog);
 
