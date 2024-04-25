@@ -30,8 +30,12 @@ const getAllKeyArticles = async (req, res) => {
 const createKeyArticles = async (req, res) => {
   try {
       const data = req.body;
-      console.log(data);
+      console.log(data.length);
       const chunkSize = Math.ceil(data.length / 100);
+
+      console.log(chunkSize);
+
+
 
       // Delete data only on the first chunk
       if (chunkSize > 0) {
@@ -40,8 +44,10 @@ const createKeyArticles = async (req, res) => {
 
       // Insert data chunk by chunk
       for (let i = 0; i < chunkSize; i++) {
-          const startIndex = i * 10;
-          const chunk = data.slice(startIndex, startIndex + 10);
+          const startIndex = i * 100;
+          const chunk = data.slice(startIndex, startIndex + 100);
+
+          console.log(chunk[0]);
           await keyArticleModel.insertMany(chunk);
           console.log("uploaded", i)
       }
