@@ -132,10 +132,14 @@ const generateNewAisleWiseBinID = async (newBin) => {
 };
 
 const generateLevelWiseBinID = async (newBin) => {
+  console.log("inside regular");
   const bins = await Bin.find({
     gondola_ID: newBin.gondola_ID,
     level: newBin.level,
   });
+
+  
+  console.log(bins);
 
   const existingIDs = bins?.map((obj) => obj.bin_ID);
 
@@ -172,7 +176,9 @@ const createBin = async (req, res) => {
     console.log(req.body);
     const newBin = req.body;
 
-    if (newBin.type === "Regular") {
+    console.log(req.body);
+
+    if (newBin.type === "regular" || newBin.type === "Regular") {
       await generateLevelWiseBinID(newBin);
     } else {
       await generateNewAisleWiseBinID(newBin);
