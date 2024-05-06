@@ -7,13 +7,13 @@ const mongoose = require("mongoose");
 const binRoutes = require("./routes/bins");
 const gondolaRoutes = require("./routes/gondola");
 const keyArticleRoutes = require("./routes/keyArticle");
-const productHistoryRoutes = require("./routes/productHistory");
-const roleRoutes = require("./routes/role");
-const userRoutes = require("./routes/UserRoutes");
+// const productHistoryRoutes = require("./routes/productHistory");
+// const roleRoutes = require("./routes/role");
+// const userRoutes = require("./routes/UserRoutes");
 const acitivityRoutes = require("./routes/activityLog");
 const barcodesRoutes = require("./routes/barcodes");
 const sitesRoutes = require("./routes/sites");
-const AppVersionRoute = require("./routes/userAppVersion")
+// const AppVersionRoute = require("./routes/userAppVersion")
 
 //express app
 const app = express();
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
 
 // ROUTES
 
-app.use("/api/user", userRoutes); // User API
+// app.use("/api/user", userRoutes); // User API
 
 app.use("/api/barcodes", barcodesRoutes); // barcodes API
 
@@ -41,13 +41,15 @@ app.use("/api/gondola", gondolaRoutes);
 
 app.use("/api/keyArticle", keyArticleRoutes);
 
-app.use("/api/history", productHistoryRoutes);
-
-app.use("/api/roles", roleRoutes);
-
 app.use("/api/activity", acitivityRoutes )
 
-app.use("/api/version", AppVersionRoute )
+
+// app.use("/api/history", productHistoryRoutes);
+
+// app.use("/api/roles", roleRoutes);
+
+
+// app.use("/api/version", AppVersionRoute )
 
 // connect to db
 // mongoose

@@ -1,7 +1,7 @@
 const Bin = require("../models/BinModel");
 const mongoose = require("mongoose");
 const Gondola = require("../models/GondolaModel");
-const productHistory = require("../models/productHistoryModel");
+// const productHistory = require("../models/productHistoryModel");
 
 // get all except deleted ones
 const getAllBins = async (req, res) => {
@@ -309,11 +309,11 @@ const deleteProducts = async (req, res) => {
       }
     }
 
-    await productHistory.create({
-      article_name,
-      article_code,
-      action: "Delete",
-    });
+    // await productHistory.create({
+    //   article_name,
+    //   article_code,
+    //   action: "Delete",
+    // });
 
     // Save the updated bin
     await bin.save();
